@@ -32,13 +32,17 @@ function Get-GithubTeamRepositories {
 
   $uri_frag = $repo_url.Substring(23)
 
-  $params = @{
-    'Method'      = 'Get'
-    'UriFragment' = "$($uri_frag)?per_page=1000"
+  $pages = (Invoke-GHRestMethod -Method Get -UriFragment $uri_frag -ExtendedResult).numPages
+  $page = 0
+
+  while ($page -ne $pages)
+  {
+    $page++
+    $repositories += Invoke-GHRestMethod -Method Get -UriFragment $uri_frag"?page="$page
   }
-
-  Invoke-GHRestMethod @params 
-
+  
+  $repositories
+  
 }
 
 <#
