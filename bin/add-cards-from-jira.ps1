@@ -3,11 +3,14 @@
 # GIthub Module: https://github.com/Microsoft/PowerShellForGitHub
 #Example usage
 # New-JiraSession -credential netid
-# .\add-cards-from-jira.ps1 -ownername uiuclibrary -repositoryname feed-business-office -JIRAProject BINF
+# .\add-cards-from-jira.ps1 -ownername uiuclibrary -repositoryname feed-business-office -JIRAProject BINF -ProjectName nameofproject
 
-param ( $OwnerName, $RepositoryName, $JIRAProject )
+param ( $OwnerName, $RepositoryName, $ProjectName, $JIRAProject )
 
 $issues = Get-JiraIssue -Query "project = $JIRAProject" | select-object summary, status, Key
+
+#Define ProjectName if not defined
+if (!$ProjectName) {$ProjectName = $RepositoryName}
 
 foreach ($issue in $issues) {
     
@@ -19,8 +22,9 @@ foreach ($issue in $issues) {
     #I don't think this is necessary, but left it in anyways.
     $summary = $Issue.summary | out-string
 
+
     if ($StatusUnknown) {Write-Output "Status is $issue.status which is not mapped to a value in the script."}
     else {
-    Get-GitHubProject -OwnerName $OwnerName -RepositoryName $RepositoryName | Get-GitHubProjectColumn | where-object { $_.name -eq $ProjectColumn } | New-GitHubProjectCard -Note $summary
+        Get-GitHubProject -OwnerName $OwnerName -RepositoryName $RepositoryName | where-object name -eq $ProjectName | Get-GitHubProjectColumn | where-object { $_.name -eq $ProjectColumn } | New-GitHubProjectCard -Note $summary
     }
 }
