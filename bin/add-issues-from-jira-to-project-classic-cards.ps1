@@ -24,7 +24,7 @@ foreach ($issue in $issues) {
     elseif ($ProjectColumn -ne "Done") {
         
     }
-    elseif ($ProjectColumn -eq "Done"){ }
+    elseif ($ProjectColumn -eq "Done"){ 
     Get-GitHubProject -OwnerName $OwnerName -RepositoryName $RepositoryName | Get-GitHubProjectColumn | where-object { $_.name -eq $ProjectColumn } | New-GitHubProjectCard -Note $summary
     }
 }

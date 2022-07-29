@@ -16,7 +16,7 @@ foreach ($issue in $issues) {
     else {$issuestatus = "Open"}
     
     $summary = $Issue.summary | out-string
-    $description = $issues.Description | out-string
+    $description = $issue.Description | out-string
     # $Issue = get-githubissue -OwnerName $OwnerName -RepositoryName $RepositoryName | where-object title -like $summary 
     
     if ($issue = get-githubissue -OwnerName $OwnerName -RepositoryName $RepositoryName | where-object title -like $summary) {
