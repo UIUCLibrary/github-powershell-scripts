@@ -3,14 +3,12 @@
 # GIthub Module: https://github.com/Microsoft/PowerShellForGitHub
 #Example usage
 # New-JiraSession -credential netid
-# .\add-cards-from-jira.ps1 -ownername uiuclibrary -repositoryname feed-business-office -JIRAProject BINF -ProjectName nameofproject
 
-param ( $OwnerName, $RepositoryName, $ProjectName, $JIRAProject )
+# .\add-cards-from-jira.ps1 -ownername uiuclibrary -repositoryname feed-business-office -JIRAProject BINF
 
-$issues = Get-JiraIssue -Query "project = $JIRAProject" | select-object summary, status, Key
+param ( $OwnerName, $RepositoryName, $JIRAProject )
 
-#Define ProjectName if not defined
-if (!$ProjectName) {$ProjectName = $RepositoryName}
+$issues = Get-JiraIssue -Query "project = $JIRAProject" | select-object summary, status, Description
 
 foreach ($issue in $issues) {
     
@@ -22,9 +20,11 @@ foreach ($issue in $issues) {
     #I don't think this is necessary, but left it in anyways.
     $summary = $Issue.summary | out-string
 
-
     if ($StatusUnknown) {Write-Output "Status is $issue.status which is not mapped to a value in the script."}
-    else {
-        Get-GitHubProject -OwnerName $OwnerName -RepositoryName $RepositoryName | where-object name -eq $ProjectName | Get-GitHubProjectColumn | where-object { $_.name -eq $ProjectColumn } | New-GitHubProjectCard -Note $summary
+    elseif ($ProjectColumn -ne "Done") {
+        
+    }
+    elseif ($ProjectColumn -eq "Done"){ 
+    Get-GitHubProject -OwnerName $OwnerName -RepositoryName $RepositoryName | Get-GitHubProjectColumn | where-object { $_.name -eq $ProjectColumn } | New-GitHubProjectCard -Note $summary
     }
 }
